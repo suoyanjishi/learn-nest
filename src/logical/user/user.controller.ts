@@ -1,7 +1,9 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, UsePipes } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from './user.service';
+import { ValidationPipe } from '../../pipe/validation.pipe';
+import { RegisterInfoDTO } from './user.dto'; // 引入 DTO
 
 @Controller('user')
 export class UserController {
@@ -34,9 +36,11 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt')) // 使用 'JWT' 进行验证
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(new ValidationPipe()) // 使用管道验证
   @Post('register')
-  async register(@Body() body: any) {
+  async register(@Body() body: RegisterInfoDTO) {
+    // 指定 DTO类型
     return await this.usersService.register(body);
   }
 }
