@@ -9,6 +9,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { CommodityService } from './commodity.service';
 import { RbacInterceptor } from '../../interceptor/rbac.interceptor';
+import { roleConstans as role } from '../auth/constants'; // 引入角色常量
 
 @Controller('commodity')
 export class CommodityController {
@@ -16,7 +17,7 @@ export class CommodityController {
 
   // 查询商品列表
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(new RbacInterceptor(3)) // 调用 RBAC 拦截器
+  @UseInterceptors(new RbacInterceptor(role.HUMAN))
   @Post('list')
   async queryColumnList(@Body() body: any) {
     return await this.commodityService.queryCommodityList(body);
@@ -24,7 +25,7 @@ export class CommodityController {
 
   // 新建商品
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(new RbacInterceptor(2))
+  @UseInterceptors(new RbacInterceptor(role.DEVELOPER))
   @Post('create')
   async createCommodity(@Body() body: any, @Request() req: any) {
     return await this.commodityService.createCommodity(body, req.user.username);
@@ -32,7 +33,7 @@ export class CommodityController {
 
   // 修改商品
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(new RbacInterceptor(2))
+  @UseInterceptors(new RbacInterceptor(role.DEVELOPER))
   @Post('update')
   async updateCommodity(@Body() body: any, @Request() req: any) {
     return await this.commodityService.updateCommodity(body, req.user.username);
@@ -40,7 +41,7 @@ export class CommodityController {
 
   // 删除商品
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(new RbacInterceptor(1))
+  @UseInterceptors(new RbacInterceptor(role.ADMIN))
   @Post('delete')
   async deleteCommodity(@Body() body: any) {
     return await this.commodityService.deleteCommodity(body);
